@@ -1,5 +1,6 @@
 f = open("input.txt", "r")
 import re
+import copy
 
 #part 1 
 
@@ -19,6 +20,9 @@ def read_stack(stack_setup):
                 stacks[i].append(crate)
     return (stack_n, stacks)
 
+def read_instruction(line):
+    return tuple(int(a) for a in re.findall("(\d+)", line))
+
 stack_text = []
 for line in f:
     if line == '\n':
@@ -27,12 +31,28 @@ for line in f:
     else:
         stack_text.append(line)
 
-def read_instruction(line):
-    return tuple(int(a) for a in re.findall("(\d+)", line))
-
 for line in f:
     quantity, src, dest = read_instruction(line)
     for _ in range(quantity):
         stacks[dest].append(stacks[src].pop())
+
+print(''.join([stacks[i + 1][-1] for i in range(stack_n)]))
+
+# part 2
+
+f.seek(0)
+
+stack_text = []
+for line in f:
+    if line == '\n':
+        stack_n, stacks = read_stack(stack_text)
+        break
+    else:
+        stack_text.append(line)
+
+for line in f:
+    quantity, src, dest = read_instruction(line)
+    stacks[dest] += stacks[src][-quantity:]
+    del stacks[src][-quantity:]
 
 print(''.join([stacks[i + 1][-1] for i in range(stack_n)]))
